@@ -1,7 +1,7 @@
 // const { ship } = require("./ship");
 // const { player } = require("./player");
 
-const player = document.getElementById("player1");
+// const player = document.getElementById("player1");
 
 class gameboard {
   constructor() {
@@ -41,12 +41,9 @@ class node {
     this.coordinate = [x, y];
     this.hit = false;
     this.ship = false;
+    this.nodeIndex = parseFloat(x.toString() + y.toString());
   }
 }
-
-// let board = new gameboard();
-// board.receiveAttack(2,3);
-// console.log(board.gameboard);
 
 module.exports = {
   gameboard,

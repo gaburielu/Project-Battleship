@@ -6,16 +6,21 @@
     <title>Navis Bellica</title>
   <script defer src="index.bundle.js"></script><script defer src="gameboard.bundle.js"></script><script defer src="ship.bundle.js"></script><script defer src="player.bundle.js"></script></head>
   <body>
-    <div class="header"><h1 class="title">Navis Bellica</h1></div>
+    <div class="header">
+      <button id="reset">restart</button>
+      <h1 class="title">Navis Bellica</h1>
+      <button id="start">starto</button>
+    </div>
+
     <div class="content">
       <div id="player1"></div>
-      <div id="gridGap"></div>
+      <div id="gridGap">&#9645; &#9647; ⚐ ☓</div>
       <div id="player2"></div>
     </div>
     <nav id="hiddenFooter" class="feet hidden">
       <div class="footer">
         <p class="acknowledgement" style="text-align: center">
-          Made by ©
+          Made by
           <a href="https://github.com/Gaburielu" class="link">Gaburielu</a> 2024
           |
           <a href="https://www.theodinproject.com/about" class="link"

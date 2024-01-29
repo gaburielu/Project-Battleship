@@ -29,8 +29,3 @@ class player {
 module.exports = {
   player,
 };
-
-let play = new player();
-console.log(play.board._getNodeAtCoordinates(2, 4));
-play.galley.hit++;
-console.log(play.ships);
