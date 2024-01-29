@@ -2,7 +2,7 @@
 
 Implementation of the classic game ‘Battleship to be played in the browser.
 
-Link to project:
+Link to project: https://gaburielu.github.io/Project-Battleship/
 
 How It's Made:
 Tech used: HTML, CSS, JavaScript, Jest & Webpack
