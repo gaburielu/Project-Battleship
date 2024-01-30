@@ -7,12 +7,11 @@ const playerTwoDOMboard = document.getElementById("player2");
 const startButton = document.getElementById("start");
 const resetButton = document.getElementById("reset");
 
-let placementStage = false;
-
 const playGame = (function () {
+  let placementStage = true;
   let roundIsActive = false;
-  let isPlayerVsComputer = false;
   let alignment = "horizontal";
+  let round = 0;
 
   const playerOne = new player();
   const userCell = [];
@@ -25,10 +24,10 @@ const playGame = (function () {
       cell.classList.add("grid-cell");
       cell.textContent = node.coordinate;
       cell.addEventListener("click", () => {
-        hitOnGrid(node, cell);
+        placeShip(node, cellArray, player);
       });
       cell.addEventListener("click", () => {
-        placeShip(node, cellArray, player);
+        hitOnGrid(node, cell);
       });
       cellArray.push(cell);
       board.appendChild(cell);
@@ -36,56 +35,116 @@ const playGame = (function () {
   }
 
   function hitOnGrid(node, cell) {
-    node.hit = true;
-    cell.style.backgroundColor = "red";
-    cell.textContent = "⚐";
+    if (!roundIsActive) {
+      if(node.hit == false){
+        node.hit = true;
+        if (node.ship == true) {
+          cell.style.backgroundColor = "red";
+          cell.textContent = "⚐";
+        } else {
+          cell.style.backgroundColor = "purple";
+          cell.textContent = "☓";
+        }
+        round++;
+      }
+    }
   }
 
   function placeShip(node, cellArr, player) {
     if (placementStage == true) {
-      const firstCell = cellArr[0];
-      firstCell.textContent = "jumbo";
-      console.log(node);
-      const x = player.board._getNodeAtCoordinates(2, 2);
-      if(x == node){
-        console.log("yipee");
-      }
-      console.log(x);
-      if (validPlacement) {
-      }
+      // const firstCell = cellArr[0];
+      // firstCell.textContent = "jumbo";
+      // console.log(node);
+      const x = player.board._getNodeAtCoordinates(3, 3);
+      x.ship = true;
+      // shipPlacementStage(node, cellArr, player);
+
+      // if (x == node) {
+      //   console.log("yipee");
+      // }
+      // console.log(x);
+      // if (validPlacement) {
+      // }
+      checkPlacementOccupied(node, 3, player);
     }
   }
 
-  function validPlacement(node, alignment) {
-    if (alignment === "horizontal") {
-    }
+  function shipPlacementStage(node, cellArr, player) {
+
   }
 
   createGrid(playerOne, playerOneDOMboard, userCell);
   createGrid(bot, playerTwoDOMboard, botCell);
+
+  resetButton.addEventListener("click", shipPlacement);
+
+  function shipPlacement() {
+    placementStage = !placementStage;
+    console.log(placementStage);
+  }
+
+  startButton.addEventListener("click", changeAlignment);
+
+  function changeAlignment() {
+    if (placementStage) {
+      if (startButton.textContent == "Horizontal ▭") {
+        startButton.textContent = "Vertical ▯";
+        alignment = "vertical";
+      } else {
+        startButton.textContent = "Horizontal ▭";
+        alignment = "horizontal";
+      }
+    }
+  }
+
+  function checkPlacementBound(node, length) {
+    if (alignment == "horizontal") {
+      if (node.y + length > 9) {
+        return false;
+      }
+      return true;
+    } else if ((alignment = "vertical")) {
+      if (node.x + length > 9) {
+        return false;
+      }
+      return true;
+    } else {
+      return null;
+    }
+  }
+
+  function checkPlacementOccupied(node, length, player) {
+    if (alignment == "horizontal" && checkPlacementBound(node, length)) {
+      for (let i = 0; i <= length; i++) {
+        if (
+          player.board._getNodeAtCoordinates(node.x, node.y + i).ship == false
+        ) {
+          continue;
+        } else if (
+          player.board._getNodeAtCoordinates(node.x, node.y + i).ship == true
+        ) {
+          console.log("occupied");
+          return false;
+        }
+      }
+    } else if (alignment == "vertical" && checkPlacementBound(node, length)) {
+      for (let i = 0; i <= length; i++) {
+        if (
+          player.board._getNodeAtCoordinates(node.x + i, node.y).ship == false
+        ) {
+          continue;
+        } else if (
+          player.board._getNodeAtCoordinates(node.x + i, node.y).ship == true
+        ) {
+          console.log("occupied");
+          return false;
+        }
+      }
+    } else if (!checkPlacementBound(node, length)) {
+      console.log("Out of bound");
+      return false;
+    } else {
+      return true;
+    }
+  }
 })();
-
-/////////////////FOOTER/////////////////
-
-const toggleFooterButton = document.getElementById("footer-toggle");
-const footer = document.getElementById("hiddenFooter");
-
-function toggleFooter() {
-  footer.classList.toggle("hidden");
-  footer.classList.toggle("show");
-}
-
-toggleFooterButton.addEventListener("click", toggleFooter);
-
-//////////////////////////
-
-startButton.addEventListener("click", sad);
-function sad() {
-  console.log("fuck yes");
-}
-
-resetButton.addEventListener("click", shipPlacement);
-function shipPlacement() {
-  placementStage = !placementStage;
-  console.log(placementStage);
-}

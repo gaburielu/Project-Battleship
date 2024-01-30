@@ -21,8 +21,8 @@ class player {
     ];
   }
 
-  insertShip(x,y){
-
+  insertShip(shipNo, node){
+    this.ships[shipNo].push(node);
   }
 }
 

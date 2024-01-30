@@ -30,8 +30,9 @@ class gameboard {
     }
   }
 
-//   insertShip(x,y){
-//   }
+  insertShip(node) {
+    node.ship = true;
+  }
 }
 
 class node {
