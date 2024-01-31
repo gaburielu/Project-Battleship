@@ -8,6 +8,7 @@ module.exports = {
     gameboard: "./src/gameboard.js", 
     ship: "./src/ship.js",
     player: "./src/player.js", 
+    utility: "./src/utils.js", 
   },
   plugins: [
     new HtmlWebpackPlugin({

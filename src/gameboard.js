@@ -33,6 +33,12 @@ class gameboard {
   insertShip(node) {
     node.ship = true;
   }
+
+  getRandomNode(){
+    let x = Math.floor(Math.random()*10);
+    let y = Math.floor(Math.random()*10);
+    return this._getNodeAtCoordinates(x,y);
+  }
 }
 
 class node {

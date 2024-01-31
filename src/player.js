@@ -6,6 +6,8 @@ class player {
     this.board = new gameboard();
     this.ships = this.makeShips();
     this.computer = false;
+    this.hitpoints = 0;
+    this.shipInserted = 0;
   }
 
   makeShips() {
@@ -21,11 +23,26 @@ class player {
     ];
   }
 
-  insertShip(shipNo, node){
-    this.ships[shipNo].push(node);
+  addHitpoints(){
+    this.hitpoints++;
   }
+
+  removeHitpoints(){
+    this.hitpoints--;
+  }
+
+  shipAdded(){
+    this.shipInserted++;
+  }
+
 }
 
 module.exports = {
   player,
 };
+
+// let z = new player();
+// console.log(z.addHitpoints());
+// console.log(z.addHitpoints());
+// console.log(z.removeHitpoints());
+// console.log(z.hitpoints);

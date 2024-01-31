@@ -16,6 +16,7 @@ const playGame = (function () {
   const playerOne = new player();
   const userCell = [];
   const bot = new player();
+  bot.computer = true;
   const botCell = [];
 
   function createGrid(player, board, cellArray) {
@@ -24,25 +25,29 @@ const playGame = (function () {
       cell.classList.add("grid-cell");
       cell.textContent = node.coordinate;
       cell.addEventListener("click", () => {
-        placeShip(node, cellArray, player);
+        shipPlacementStage(node, cellArray, player);
       });
       cell.addEventListener("click", () => {
         hitOnGrid(node, cell);
       });
+      cell.addEventListener("click", () => {
+        // hitOnGrid(node, cell);
+      });
       cellArray.push(cell);
       board.appendChild(cell);
+
     });
   }
 
   function hitOnGrid(node, cell) {
     if (!roundIsActive) {
-      if(node.hit == false){
+      if (node.hit == false) {
         node.hit = true;
         if (node.ship == true) {
           cell.style.backgroundColor = "red";
           cell.textContent = "⚐";
         } else {
-          cell.style.backgroundColor = "purple";
+          cell.style.backgroundColor = "lightblue";
           cell.textContent = "☓";
         }
         round++;
@@ -70,11 +75,54 @@ const playGame = (function () {
   }
 
   function shipPlacementStage(node, cellArr, player) {
-
+    let shipNo = player.shipInserted;
+    let boat = player.ships[shipNo];
+    let length = boat.length;
+    if (shipNo < 8) {
+      if (
+        checkPlacementOccupied(node, length, player) == undefined &&
+        alignment == "horizontal"
+      ) {
+        for (let i = 0; i < length; i++) {
+          let focusedNode = player.board._getNodeAtCoordinates(
+            node.x,
+            node.y + i
+          );
+          focusedNode.ship = true;
+          cellArr[focusedNode.nodeIndex].textContent = "shi";
+          cellArr[focusedNode.nodeIndex].style.backgroundColor =
+            "var(--color-primary)";
+          player.addHitpoints();
+        }
+        player.shipAdded();
+      } else if (
+        checkPlacementOccupied(node, length, player) == undefined &&
+        alignment == "vertical"
+      ) {
+        for (let i = 0; i < length; i++) {
+          let focusedNode = player.board._getNodeAtCoordinates(
+            node.x + i,
+            node.y
+          );
+          focusedNode.ship = true;
+          cellArr[focusedNode.nodeIndex].textContent = "shi";
+          cellArr[focusedNode.nodeIndex].style.backgroundColor =
+            "var(--color-primary)";
+          player.addHitpoints();
+        }
+        player.shipAdded();
+      }
+    }
+    console.log(player.shipInserted);
+    if (player.shipInserted == 8) {
+      console.log(player.hitpoints);
+    }
   }
 
   createGrid(playerOne, playerOneDOMboard, userCell);
+
   createGrid(bot, playerTwoDOMboard, botCell);
+  botShipPlacement(bot, botCell);
 
   resetButton.addEventListener("click", shipPlacement);
 
@@ -99,12 +147,12 @@ const playGame = (function () {
 
   function checkPlacementBound(node, length) {
     if (alignment == "horizontal") {
-      if (node.y + length > 9) {
+      if (node.y + length > 10) {
         return false;
       }
       return true;
     } else if ((alignment = "vertical")) {
-      if (node.x + length > 9) {
+      if (node.x + length > 10) {
         return false;
       }
       return true;
@@ -113,30 +161,36 @@ const playGame = (function () {
     }
   }
 
-  function checkPlacementOccupied(node, length, player) {
-    if (alignment == "horizontal" && checkPlacementBound(node, length)) {
-      for (let i = 0; i <= length; i++) {
-        if (
-          player.board._getNodeAtCoordinates(node.x, node.y + i).ship == false
-        ) {
+  function checkPlacementOccupied(node, length, player, align = alignment) {
+    if (align == "horizontal" && checkPlacementBound(node, length)) {
+      for (let i = 0; i < length; i++) {
+        let z = node.y + i;
+        if (z < 0) {
+          z = 0;
+        }
+        if (player.board._getNodeAtCoordinates(node.x, z).ship == false) {
           continue;
-        } else if (
-          player.board._getNodeAtCoordinates(node.x, node.y + i).ship == true
-        ) {
+        } else if (player.board._getNodeAtCoordinates(node.x, z).ship == true) {
           console.log("occupied");
           return false;
         }
       }
-    } else if (alignment == "vertical" && checkPlacementBound(node, length)) {
-      for (let i = 0; i <= length; i++) {
-        if (
-          player.board._getNodeAtCoordinates(node.x + i, node.y).ship == false
-        ) {
-          continue;
-        } else if (
-          player.board._getNodeAtCoordinates(node.x + i, node.y).ship == true
-        ) {
-          console.log("occupied");
+    } else if (align == "vertical" && checkPlacementBound(node, length)) {
+      for (let i = 0; i < length; i++) {
+        let z = node.x + i;
+        if (z < 0) {
+          z = 0;
+        }
+        if (player.board._getNodeAtCoordinates(z, node.y)) {
+          if (player.board._getNodeAtCoordinates(z, node.y).ship == false) {
+            continue;
+          } else if (
+            player.board._getNodeAtCoordinates(z, node.y).ship == true
+          ) {
+            console.log("occupied");
+            return false;
+          }
+        } else {
           return false;
         }
       }
@@ -145,6 +199,74 @@ const playGame = (function () {
       return false;
     } else {
       return true;
+    }
+  }
+
+  function botShipPlacement(player, cellArr) {
+    let shipNo = player.shipInserted;
+    let boat = player.ships[shipNo];
+    let length = boat.length;
+    let align = getRandomAlignment();
+    let randomNode = player.board.getRandomNode();
+    function getShip() {
+      align = getRandomAlignment();
+      if (checkPlacementOccupied(randomNode, length, player, align) == false) {
+        randomNode = player.board.getRandomNode();
+      } else if (
+        checkPlacementOccupied(randomNode, length, player, align) ==
+          undefined &&
+        align == "horizontal"
+      ) {
+        for (let i = 0; i < length; i++) {
+          let focusedNode = player.board._getNodeAtCoordinates(
+            randomNode.x,
+            randomNode.y + i
+          );
+          focusedNode.ship = true;
+          cellArr[focusedNode.nodeIndex].textContent = "shi";
+          cellArr[focusedNode.nodeIndex].style.backgroundColor =
+            "var(--color-primary)";
+          player.addHitpoints();
+        }
+        player.shipAdded();
+      } else if (
+        checkPlacementOccupied(randomNode, length, player, align) ==
+          undefined &&
+        align == "vertical"
+      ) {
+        for (let i = 0; i < length; i++) {
+          let focusedNode = player.board._getNodeAtCoordinates(
+            randomNode.x + i,
+            randomNode.y
+          );
+          focusedNode.ship = true;
+          cellArr[focusedNode.nodeIndex].textContent = "shi";
+          cellArr[focusedNode.nodeIndex].style.backgroundColor =
+            "var(--color-primary)";
+          player.addHitpoints();
+        }
+        player.shipAdded();
+      }
+    }
+    while (shipNo < 8) {
+      getShip();
+      shipNo = player.shipInserted;
+      if (shipNo < 8) {
+        boat = player.ships[shipNo];
+        length = boat.length;
+      }
+    }
+    console.log(player.shipInserted);
+    if (player.shipInserted == 8) {
+      console.log("Computer is ready");
+    }
+  }
+  function getRandomAlignment() {
+    let align = Math.floor(Math.random() * 2);
+    if (align == 0) {
+      return "horizontal";
+    } else {
+      return "vertical";
     }
   }
 })();

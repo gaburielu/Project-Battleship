@@ -6,7 +6,7 @@ class ship {
     this.length = length;
     this.hitpoint = 0;
     this.sunk = this.isSunk();
-    this.shipCoor = new Array(this.length);
+    
   }
   hit() {
     this.hitpoint++;
