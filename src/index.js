@@ -1,17 +1,18 @@
 import "./style.css";
 import "./normalize.css";
 const { player } = require("./player");
+const { playCannon } = require("./utils.js");
 
 const playerOneDOMboard = document.getElementById("player1");
 const playerTwoDOMboard = document.getElementById("player2");
 const startButton = document.getElementById("start");
-const resetButton = document.getElementById("reset");
+const title = document.getElementById("title");
 
 const playGame = (function () {
   let placementStage = true;
   let roundIsActive = false;
   let alignment = "horizontal";
-  let round = 0;
+  let keyActive = true;
 
   const playerOne = new player();
   const userCell = [];
@@ -23,61 +24,99 @@ const playGame = (function () {
     player.board.gameboard.forEach((node) => {
       const cell = document.createElement("div");
       cell.classList.add("grid-cell");
-      cell.textContent = node.coordinate;
       cell.addEventListener("click", () => {
         shipPlacementStage(node, cellArray, player);
       });
       cell.addEventListener("click", () => {
-        hitOnGrid(node, cell);
+        if (player.computer && roundIsActive == true && keyActive) {
+          title.textContent = `You:  ${playerOne.hitpoints}  -  Enemy:  ${bot.hitpoints}`;
+          hitOnGrid(node, cell, player);
+        }
       });
-      cell.addEventListener("click", () => {
-        // hitOnGrid(node, cell);
+      cell.addEventListener("mouseenter", () => {
+        cell.style.transform = "scale(1.2)";
+        if (player.computer) {
+          cell.style.border = "5px solid var(--color-secondary)";
+        } else {
+          cell.style.border = "5px solid var(--color-secondary)";
+        }
+      });
+      cell.addEventListener("mouseleave", () => {
+        cell.style.transform = "scale(1)";
+        if (player.computer) {
+          cell.style.border = "1px solid var(--color-secondary)";
+        } else {
+          cell.style.border = "1px solid var(--color-secondary)";
+        }
       });
       cellArray.push(cell);
       board.appendChild(cell);
-
     });
   }
 
-  function hitOnGrid(node, cell) {
-    if (!roundIsActive) {
+  function hitOnGrid(node, cell, player) {
+    if (roundIsActive) {
       if (node.hit == false) {
         node.hit = true;
         if (node.ship == true) {
+          playCannon();
+          title.textContent = `You: ${playerOne.hitpoints} - Enemy: ${bot.hitpoints}`;
           cell.style.backgroundColor = "red";
           cell.textContent = "⚐";
+          player.removeHitpoints();
         } else {
           cell.style.backgroundColor = "lightblue";
           cell.textContent = "☓";
         }
-        round++;
+        setTimeout(() => botPlay(), 200); 
+        checkWinCondition();
       }
     }
   }
 
-  function placeShip(node, cellArr, player) {
-    if (placementStage == true) {
-      // const firstCell = cellArr[0];
-      // firstCell.textContent = "jumbo";
-      // console.log(node);
-      const x = player.board._getNodeAtCoordinates(3, 3);
-      x.ship = true;
-      // shipPlacementStage(node, cellArr, player);
+  function botPlay() {
+    if (roundIsActive) {
+      let randomNode;
+      do {
+        randomNode = playerOne.board.getRandomNode();
+      } while (randomNode.hit);
+      randomNode.hit = true;
+      const randomNodeCell = userCell[randomNode.nodeIndex];
+      if (randomNode.ship == true) {
+        playCannon();
+        title.textContent = `You: ${playerOne.hitpoints} - Enemy: ${bot.hitpoints}`;
+        randomNodeCell.style.backgroundColor = "red";
+        randomNodeCell.textContent = "⚐";
+        playerOne.removeHitpoints();
+      } else {
+        randomNodeCell.style.backgroundColor = "lightblue";
+        randomNodeCell.textContent = "☓";
+      }
+    }
+  }
 
-      // if (x == node) {
-      //   console.log("yipee");
-      // }
-      // console.log(x);
-      // if (validPlacement) {
-      // }
-      checkPlacementOccupied(node, 3, player);
+  function checkWinCondition() {
+    if (roundIsActive) {
+      if (playerOne.hitpoints == 0) {
+        title.textContent = "DEFEAT!";
+        keyActive = false;
+      } else if (bot.hitpoints == 0) {
+        title.textContent = "VICTORY!";
+        keyActive = false;
+      }
     }
   }
 
   function shipPlacementStage(node, cellArr, player) {
     let shipNo = player.shipInserted;
     let boat = player.ships[shipNo];
-    let length = boat.length;
+    let length;
+    if (player.shipInserted <= 7) {
+      length = boat.length;
+    } else {
+      length = 8;
+    }
+
     if (shipNo < 8) {
       if (
         checkPlacementOccupied(node, length, player) == undefined &&
@@ -89,7 +128,7 @@ const playGame = (function () {
             node.y + i
           );
           focusedNode.ship = true;
-          cellArr[focusedNode.nodeIndex].textContent = "shi";
+          cellArr[focusedNode.nodeIndex].textContent = "⚑";
           cellArr[focusedNode.nodeIndex].style.backgroundColor =
             "var(--color-primary)";
           player.addHitpoints();
@@ -105,17 +144,32 @@ const playGame = (function () {
             node.y
           );
           focusedNode.ship = true;
-          cellArr[focusedNode.nodeIndex].textContent = "shi";
+          cellArr[focusedNode.nodeIndex].textContent = "⚑";
           cellArr[focusedNode.nodeIndex].style.backgroundColor =
             "var(--color-primary)";
           player.addHitpoints();
         }
         player.shipAdded();
       }
+    } else if (player.shipInserted > 7 && player.computer != true) {
     }
-    console.log(player.shipInserted);
-    if (player.shipInserted == 8) {
-      console.log(player.hitpoints);
+    if (player.shipInserted == 1 || player.shipInserted == 2) {
+      title.textContent = "Insert your Caravel";
+    } else if (player.shipInserted == 3 || player.shipInserted == 4) {
+      title.textContent = "Insert your Scout Ship";
+    } else if (
+      player.shipInserted == 5 ||
+      player.shipInserted == 6 ||
+      player.shipInserted == 7
+    ) {
+      title.textContent = "Insert your Gulley";
+    } else {
+      if (player.computer == false) {
+        title.textContent = "GAME START!";
+        placementStage = false;
+        roundIsActive = true;
+        startButton.textContent = "Restart?";
+      }
     }
   }
 
@@ -123,13 +177,6 @@ const playGame = (function () {
 
   createGrid(bot, playerTwoDOMboard, botCell);
   botShipPlacement(bot, botCell);
-
-  resetButton.addEventListener("click", shipPlacement);
-
-  function shipPlacement() {
-    placementStage = !placementStage;
-    console.log(placementStage);
-  }
 
   startButton.addEventListener("click", changeAlignment);
 
@@ -142,6 +189,9 @@ const playGame = (function () {
         startButton.textContent = "Horizontal ▭";
         alignment = "horizontal";
       }
+    } else if (!placementStage) {
+      startButton.textContent = "Reset";
+      location.reload();
     }
   }
 
@@ -171,7 +221,6 @@ const playGame = (function () {
         if (player.board._getNodeAtCoordinates(node.x, z).ship == false) {
           continue;
         } else if (player.board._getNodeAtCoordinates(node.x, z).ship == true) {
-          console.log("occupied");
           return false;
         }
       }
@@ -187,7 +236,6 @@ const playGame = (function () {
           } else if (
             player.board._getNodeAtCoordinates(z, node.y).ship == true
           ) {
-            console.log("occupied");
             return false;
           }
         } else {
@@ -195,7 +243,6 @@ const playGame = (function () {
         }
       }
     } else if (!checkPlacementBound(node, length)) {
-      console.log("Out of bound");
       return false;
     } else {
       return true;
