@@ -68,7 +68,7 @@ const playGame = (function () {
           cell.style.backgroundColor = "lightblue";
           cell.textContent = "☓";
         }
-        setTimeout(() => botPlay(), 200); 
+        setTimeout(() => botPlay(), 200);
         checkWinCondition();
       }
     }
@@ -84,7 +84,6 @@ const playGame = (function () {
       const randomNodeCell = userCell[randomNode.nodeIndex];
       if (randomNode.ship == true) {
         playCannon();
-        title.textContent = `You: ${playerOne.hitpoints} - Enemy: ${bot.hitpoints}`;
         randomNodeCell.style.backgroundColor = "red";
         randomNodeCell.textContent = "⚐";
         playerOne.removeHitpoints();
@@ -165,7 +164,9 @@ const playGame = (function () {
       title.textContent = "Insert your Gulley";
     } else {
       if (player.computer == false) {
-        title.textContent = "GAME START!";
+        if (keyActive) {
+          title.textContent = "GAME START!";
+        }
         placementStage = false;
         roundIsActive = true;
         startButton.textContent = "Restart?";
