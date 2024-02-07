@@ -1,8 +1,3 @@
-// const { ship } = require("./ship");
-// const { player } = require("./player");
-
-// const player = document.getElementById("player1");
-
 class gameboard {
   constructor() {
     this.gameboard = this.makeGameboard();

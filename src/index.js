@@ -1,7 +1,6 @@
 import "./style.css";
 import "./normalize.css";
 const { player } = require("./player");
-const { playCannon } = require("./utils.js");
 
 const playerOneDOMboard = document.getElementById("player1");
 const playerTwoDOMboard = document.getElementById("player2");
@@ -59,7 +58,6 @@ const playGame = (function () {
       if (node.hit == false) {
         node.hit = true;
         if (node.ship == true) {
-          playCannon();
           title.textContent = `You: ${playerOne.hitpoints} - Enemy: ${bot.hitpoints}`;
           cell.style.backgroundColor = "red";
           cell.textContent = "⚐";
@@ -83,7 +81,6 @@ const playGame = (function () {
       randomNode.hit = true;
       const randomNodeCell = userCell[randomNode.nodeIndex];
       if (randomNode.ship == true) {
-        playCannon();
         randomNodeCell.style.backgroundColor = "red";
         randomNodeCell.textContent = "⚐";
         playerOne.removeHitpoints();
@@ -271,9 +268,9 @@ const playGame = (function () {
             randomNode.y + i
           );
           focusedNode.ship = true;
-          cellArr[focusedNode.nodeIndex].textContent = "shi";
-          cellArr[focusedNode.nodeIndex].style.backgroundColor =
-            "var(--color-primary)";
+          // cellArr[focusedNode.nodeIndex].textContent = "shi";
+          // cellArr[focusedNode.nodeIndex].style.backgroundColor =
+          //   "var(--color-primary)";
           player.addHitpoints();
         }
         player.shipAdded();
@@ -288,9 +285,9 @@ const playGame = (function () {
             randomNode.y
           );
           focusedNode.ship = true;
-          cellArr[focusedNode.nodeIndex].textContent = "shi";
-          cellArr[focusedNode.nodeIndex].style.backgroundColor =
-            "var(--color-primary)";
+          // cellArr[focusedNode.nodeIndex].textContent = "shi";
+          // cellArr[focusedNode.nodeIndex].style.backgroundColor =
+          //   "var(--color-primary)";
           player.addHitpoints();
         }
         player.shipAdded();

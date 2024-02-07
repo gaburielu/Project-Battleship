@@ -1,4 +1,4 @@
-const { gameboard, node } = require("./gameboard");
+const { gameboard } = require("./gameboard");
 const { ship } = require("./ship");
 
 class player {

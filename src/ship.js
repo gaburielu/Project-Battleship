@@ -1,6 +1,3 @@
-const { gameboard, node } = require("./gameboard");
-// const { player } = require("./player");
-
 class ship {
   constructor(length) {
     this.length = length;
